@@ -1,0 +1,100 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <Windows.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
+struct book {
+	char name[20];
+	char author[20];
+	int page;
+	int date;
+	char style[20];
+	struct book *next;
+	struct book *prev;
+};
+struct book *temp, *current;
+
+void Push(struct book **first) {
+	temp = (struct book*)malloc(sizeof(struct book));
+	do {
+		current = temp;
+		printf("¬вед≥ть назву, автора, к≥льк≥сть стор≥нок, р≥к випуску та стиль книги.\n");
+		scanf("%s %s %d %d %s", current->name, current->author, &current->page, &current->date, current->style);
+		current->next = (struct book*)malloc(sizeof(struct book));
+		temp = current->next;
+		if ((*first)->next == NULL) {
+			(*first)->next = current->next;
+			*first = current;
+		}
+		temp->prev = current;
+	} while (*current->name!='0' && *current->author!='0' && current->page!=0 && current->date!=0 && *current->style!='0');
+	current = current->prev;
+	current->next = NULL;
+}
+
+void Init(struct book **first) {
+	*first = (struct book*)malloc(sizeof(struct book));
+	(*first)->next = NULL;
+	(*first)->prev = NULL;
+}
+
+void Input(struct book **first) {
+	printf("\n¬иведенн€ вм≥сту списку.\n");
+	current = *first;
+	do {
+		printf("%s %s %d %d %s\n", current->name, current->author, current->page, current->date, current->style);
+		current = current->next;
+	} while (current != NULL);
+}
+
+void InputByDate(struct book **first, int customDate) {
+	FILE *file;
+	file = fopen("Books.txt", "w");
+	printf("\n¬иведенн€ книг р≥к випуску €ких вищий за введений.\n");
+	current = *first;
+	do {
+		if (current->date >= customDate) {
+			fprintf(file, "%s %s %d %d %s\n", current->name, current->author, current->page, current->date, current->style);
+			printf("%s %s %d %d %s\n", current->name, current->author, current->page, current->date, current->style);			
+		}
+		current = current->next;
+	} while (current != NULL);
+	fclose(file);
+}
+
+void EditList(struct book **first) {
+	printf("\n¬идаленн€ першого елемента...\n");
+	*first = (*first)->next;
+	(*first)->prev = NULL;
+	printf("«м≥на першого ≥ другого елемента м≥сц€ми...\n");
+	temp = (*first)->next;
+	(*first)->next = temp->next;
+	(*first)->prev = temp;
+	temp->next = *first;
+	temp->prev = NULL;
+	*first = temp;
+	
+}
+
+int main() {
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+	int customDate;
+
+	struct book *first;
+	first = NULL;
+
+	Init(&first);
+	Push(&first);
+	Input(&first);
+
+	printf("¬вед≥ть р≥к випуску книги.\n");
+	scanf("%d", &customDate);
+	InputByDate(&first, customDate);
+	EditList(&first);
+	Input(&first);
+
+
+	return 0;
+}
